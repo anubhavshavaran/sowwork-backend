@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { ArtistModule } from './artist/artist.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ArtistModule } from './artist/artist.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('DATABASE_URL'),
+        dbName: configService.get<string>('DATABASE_NAME'),
         onConnectionCreate: (connection: Connection) => {
           connection.on('connected', () => console.log('connected'));
           connection.on('open', () => console.log('open'));
@@ -30,7 +32,7 @@ import { ArtistModule } from './artist/artist.module';
     }),
     ArtistModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
