@@ -7,11 +7,12 @@ import { Model } from 'mongoose';
 export class ArtistService {
   constructor(@InjectModel(Artist.name) private artistModel: Model<Artist>) {}
 
-  // create(cat: Cat) {
-  //   this.cats.push(cat);
-  // }
-  //
-  // findAll(): Cat[] {
-  //   return this.cats;
-  // }
+  async create(artist: Artist): Promise<Artist> {
+    const createdCat = new this.artistModel(artist);
+    return createdCat.save();
+  }
+
+  async findAll(): Promise<Artist[]> {
+    return this.artistModel.find().exec();
+  }
 }

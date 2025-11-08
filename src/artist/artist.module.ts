@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { Artist, ArtistSchema } from './schemas/artist.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ArtistService } from './artist.service';
+import { ArtistController } from './artist.controller';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Artist.name, schema: ArtistSchema }]),
   ],
-  controllers: [],
-  providers: [],
+  controllers: [ArtistController],
+  providers: [ArtistService],
 })
 export class ArtistModule {}

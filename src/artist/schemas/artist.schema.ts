@@ -12,8 +12,6 @@ export class Artist {
   name: string;
   @Prop()
   age: number;
-  @Prop()
-  breed: string;
 }
 
 export const ArtistSchema = SchemaFactory.createForClass(Artist);

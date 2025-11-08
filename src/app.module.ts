@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
+import { ArtistModule } from './artist/artist.module';
 
 @Module({
   imports: [
@@ -28,8 +28,9 @@ import { Connection } from 'mongoose';
       }),
       inject: [ConfigService],
     }),
+    ArtistModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [AppService],
 })
 export class AppModule {}
