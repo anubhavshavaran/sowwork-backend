@@ -34,7 +34,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     ArtistModule,
     UserModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
