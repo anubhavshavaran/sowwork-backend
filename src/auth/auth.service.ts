@@ -4,13 +4,12 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SendCodeDto } from './dto/sendCode.dto';
 import { UserService } from '../user/user.service';
 import { UserRole, UserStatus } from '../common/constants';
 import { ConfigService } from '@nestjs/config';
-import { ValidateCodeDto } from './dto/validateCode.dto';
+import { SendCodeDto, ValidateCodeDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserDocument } from '../user/schemas/user.schema';
+import { UserDocument } from '../user/schemas';
 
 @Injectable()
 export class AuthService {
