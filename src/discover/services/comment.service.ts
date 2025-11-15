@@ -13,7 +13,7 @@ export class CommentService {
   async addComment(
     postId: string,
     userId: string,
-    text: string,
+    comment: string,
   ): Promise<CommentDocument> {
     const post = await this.postModel.findById(postId);
     if (!post) throw new NotFoundException('Post not found');
@@ -21,7 +21,7 @@ export class CommentService {
     const newComment = await this.commentModel.create({
       post: postId,
       user: userId,
-      comment: text,
+      comment,
     });
 
     await this.postModel.findByIdAndUpdate(postId, {
