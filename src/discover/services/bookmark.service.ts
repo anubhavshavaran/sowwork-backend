@@ -33,6 +33,7 @@ export class BookmarkService {
       .populate({
         path: 'post',
       })
+      .select('-user')
       .sort({ created_at: -1 })
       .exec();
   }
