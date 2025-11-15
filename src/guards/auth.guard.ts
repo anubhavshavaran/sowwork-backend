@@ -10,6 +10,11 @@ import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { UserService } from '../user/user.service';
 import { UserStatus } from '../common/constants';
+import { UserDocument } from '../user/schemas';
+
+interface AuthenticatedRequest extends Request {
+  user?: UserDocument;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -20,7 +25,7 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
@@ -33,10 +38,14 @@ export class AuthGuard implements CanActivate {
 
       const user = await this.userService.findUser({ _id: data?._id });
 
-      if (!user || user.status === UserStatus.STATUS_DELETED || user.status === UserStatus.STATUS_INACTIVE)
+      if (
+        !user ||
+        user.status === UserStatus.STATUS_DELETED ||
+        user.status === UserStatus.STATUS_INACTIVE
+      )
         throw new UnauthorizedException('User not found');
 
-      request['user'] = user;
+      request.user = user;
     } catch {
       throw new UnauthorizedException();
     }

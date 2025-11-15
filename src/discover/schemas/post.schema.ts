@@ -5,7 +5,10 @@ import { Status } from '../../common/constants';
 export type PostDocument = HydratedDocument<Post>;
 
 @Schema({
-  timestamps: true,
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+  },
   toJSON: { virtuals: true },
   toObject: { virtuals: true },
 })
@@ -26,7 +29,11 @@ export class Post {
   postOnPortfolio: boolean;
   @Prop({ type: Boolean, default: false })
   postOnFeed: boolean;
-  @Prop()
+  @Prop({ type: Number, default: 0 })
+  comments: number;
+  @Prop({ type: Number, default: 0 })
+  likes: number;
+  @Prop({ type: Boolean, default: false })
   isDeleted: boolean;
   @Prop()
   deletedAt: Date;
