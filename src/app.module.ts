@@ -7,6 +7,7 @@ import { ArtistModule } from './artist/artist.module';
 import { AppController } from './app.controller';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { DiscoverModule } from './discover/discover.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AuthModule } from './auth/auth.module';
     ArtistModule,
     UserModule,
     AuthModule,
+    DiscoverModule,
   ],
   controllers: [AppController],
   providers: [AppService],
