@@ -1,11 +1,7 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { SocketMessageDto } from './dto/socketMessage.dto';
+import { FilterQuery, Model, Types } from 'mongoose';
+import { SocketMessageDto } from './dto';
 import { Chat, ChatDocument, ChatRoom, ChatRoomDocument } from './schemas';
 
 @Injectable()
@@ -16,28 +12,15 @@ export class ChatService {
   ) {}
 
   async saveMessage(userId: string, dto: SocketMessageDto) {
-    const room = await this.chatRoomModel.findById(dto.roomId);
+    const room = await this.chatRoomModel.findOne({ roomId: dto.roomId });
 
-    if (!room) {
+    if (!room || room.isDeleted) {
       throw new NotFoundException('Chat room not found');
-    }
-
-    if (room.isDeleted) {
-      throw new ForbiddenException('This chat room is deleted');
-    }
-
-    const uid = new Types.ObjectId(userId);
-    const isArtist = room.artist.equals(uid);
-    const isCustomer = room.customer.equals(uid);
-
-    if (!isArtist && !isCustomer) {
-      throw new ForbiddenException('You are not a participant in this chat');
     }
 
     const newChat = await this.chatModel.create({
       chatRoom: room._id,
-      artist: room.artist,
-      customer: room.customer,
+      sender: userId,
       message: dto.message,
       document: dto.document,
     });
@@ -48,13 +31,57 @@ export class ChatService {
     };
   }
 
-  async getChatRoomMessages(chatRoomId: string, skip: number, limit: number) {
-    return this.chatModel
-      .find({
-        chatRoom: new Types.ObjectId(chatRoomId),
-      })
-      .skip(skip)
-      .limit(limit);
+  async getChatRoomMessages(
+    userId: Types.ObjectId,
+    chatRoomId: string,
+    skip: number,
+    limit: number,
+  ) {
+    const messages = await this.chatModel.aggregate([
+      {
+        $match: {
+          chatRoom: new Types.ObjectId(chatRoomId),
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $facet: {
+          sender: [
+            {
+              $match: {
+                sender: userId,
+              },
+            },
+            {
+              $skip: skip,
+            },
+            {
+              $limit: limit,
+            },
+          ],
+          receiver: [
+            {
+              $match: {
+                sender: {
+                  $ne: userId,
+                },
+              },
+            },
+            {
+              $skip: skip,
+            },
+            {
+              $limit: limit,
+            },
+          ],
+        },
+      },
+    ]);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return messages[0];
   }
 
   async createChatRoom(customerId: string, artistId: string) {
@@ -71,6 +98,10 @@ export class ChatService {
         customer: new Types.ObjectId(customerId),
       });
     }
+  }
+
+  async findChatRoom(filterQuery: FilterQuery<ChatRoom>) {
+    return this.chatRoomModel.findOne(filterQuery).exec();
   }
 
   async deleteChatRoom(chatRoomId: string) {

@@ -35,15 +35,25 @@ export class ChatController {
   @Post('message/get-all/:id')
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  getChatRoomMessages(
+  async getChatRoomMessages(
     @Param('id') roomId: string,
     @Body() postRequestFilterDto: PostRequestFilterDto,
+    @CurrentUser() user: UserDocument,
   ) {
-    return this.chatService.getChatRoomMessages(
+    const chatRoom = await this.chatService.findChatRoom({ _id: roomId });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const messages = await this.chatService.getChatRoomMessages(
+      user?._id,
       roomId,
       postRequestFilterDto.skip,
       postRequestFilterDto.limit,
     );
+
+    return {
+      chatRoom,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      messages,
+    };
   }
 
   @Post('room/create')
@@ -54,5 +64,12 @@ export class ChatController {
       createChatRoomDto.customerId,
       createChatRoomDto.artistId,
     );
+  }
+
+  @Post('room/delete/:id')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.GONE)
+  deleteChatRoom(@Param('id') roomId: string) {
+    return this.chatService.deleteChatRoom(roomId);
   }
 }

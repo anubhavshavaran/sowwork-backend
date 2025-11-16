@@ -20,7 +20,7 @@ export class ChatRoom {
     type: String,
     default: () => `room_${crypto.randomBytes(6).toString('hex')}`,
   })
-  socketId: string;
+  roomId: string;
 
   @Prop({ default: false })
   isDeleted: boolean;
