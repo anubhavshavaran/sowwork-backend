@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { DiscoverModule } from './discover/discover.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { DiscoverModule } from './discover/discover.module';
     UserModule,
     AuthModule,
     DiscoverModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
