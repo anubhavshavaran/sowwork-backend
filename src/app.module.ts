@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { DiscoverModule } from './discover/discover.module';
 import { ChatModule } from './chat/chat.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ChatModule } from './chat/chat.module';
     AuthModule,
     DiscoverModule,
     ChatModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],
