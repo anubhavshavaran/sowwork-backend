@@ -19,13 +19,13 @@ export class LikeService {
     if (existingLike) {
       await this.likeModel.deleteOne({ _id: existingLike._id });
       await this.postModel.findByIdAndUpdate(postId, {
-        $inc: { likesCount: -1 },
+        $inc: { likes: -1 },
       });
       return { isLiked: false };
     } else {
       await this.likeModel.create({ post: postId, user: userId });
       await this.postModel.findByIdAndUpdate(postId, {
-        $inc: { likesCount: 1 },
+        $inc: { likes: 1 },
       });
       return { isLiked: true };
     }

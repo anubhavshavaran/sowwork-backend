@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { DiscoverModule } from './discover/discover.module';
 import { ChatModule } from './chat/chat.module';
 import { AddressModule } from './address/address.module';
+import { JobModule } from './job/job.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AddressModule } from './address/address.module';
     DiscoverModule,
     ChatModule,
     AddressModule,
+    JobModule,
   ],
   controllers: [AppController],
   providers: [AppService],

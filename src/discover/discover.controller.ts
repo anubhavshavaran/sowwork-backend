@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -18,6 +19,7 @@ import { CreateCommentDto, CreatePostDto } from './dto';
 import { AuthGuard } from '../guards';
 import { CurrentUser } from '../auth/decorators';
 import { type UserDocument } from '../user/schemas';
+import { PostRequestFilterDto } from 'src/common/dto';
 
 @Controller('discover')
 export class DiscoverController {
@@ -26,11 +28,20 @@ export class DiscoverController {
     private readonly bookmarkService: BookmarkService,
     private readonly commentService: CommentService,
     private readonly likeService: LikeService,
-  ) {}
+  ) { }
 
-  @Get('post/get-all')
-  getAllPosts() {
-    return this.postService.findAll();
+  @Post('post/get-all')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  getAllPosts(
+    @CurrentUser() user: UserDocument,
+    @Body() postRequestFilterDto: PostRequestFilterDto
+  ) {
+    return this.postService.findAll(
+      user?._id,
+      postRequestFilterDto.skip,
+      postRequestFilterDto.limit
+    );
   }
 
   @Get('post/get-one/:id')
@@ -51,24 +62,24 @@ export class DiscoverController {
     return this.postService.create(body, user?._id?.toString());
   }
 
-  @Post('post/delete/:id')
+  @Post('post/delete')
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  deletePost(@Param('id') id: string, @CurrentUser() user: UserDocument) {
+  deletePost(@Query('id') id: string, @CurrentUser() user: UserDocument) {
     return this.postService.delete(id, user?._id?.toString());
   }
 
-  @Post('post/like/:id')
+  @Post('post/like')
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  likePost(@Param('id') id: string, @CurrentUser() user: UserDocument) {
+  likePost(@Query('id') id: string, @CurrentUser() user: UserDocument) {
     return this.likeService.toggleLike(id, user?._id?.toString());
   }
 
-  @Post('bookmark/create/:id')
+  @Post('bookmark/create')
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  toggleBookmark(@Param('id') id: string, @CurrentUser() user: UserDocument) {
+  toggleBookmark(@Query('id') id: string, @CurrentUser() user: UserDocument) {
     return this.bookmarkService.toggleBookmark(id, user?._id?.toString());
   }
 
@@ -79,18 +90,18 @@ export class DiscoverController {
     return this.bookmarkService.getMyBookmarks(user?._id?.toString());
   }
 
-  @Get('comment/get-all-by-post/:id')
+  @Get('comment/get-all-by-post')
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  getComments(@Param('id') id: string) {
+  getComments(@Query('id') id: string) {
     return this.commentService.getCommentsByPost(id);
   }
 
-  @Post('comment/create/:id')
+  @Post('comment/create')
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   addComment(
-    @Param('id') id: string,
+    @Query('id') id: string,
     @Body() createCommentDto: CreateCommentDto,
     @CurrentUser() user: UserDocument,
   ) {
@@ -99,5 +110,17 @@ export class DiscoverController {
       user?._id?.toString(),
       createCommentDto.comment,
     );
+  }
+
+  @Post('report-post')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  report(
+    @Query('id') id: string,
+    @CurrentUser() user: UserDocument,
+  ) {
+    console.log(`Post with id ${id} has been successfully reported the user ${user?._id}`);
+
+    return true;
   }
 }
