@@ -1,5 +1,5 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { UserRole, UserStatus } from '../../common/constants';
 
 export type UserDocument = HydratedDocument<User>;
@@ -13,7 +13,7 @@ export class User {
   @Prop()
   firstName: string;
   @Prop()
-  lastName: number;
+  lastName: string;
   @Prop({ trim: true, lowercase: true })
   email: string;
   @Prop({ trim: true })
@@ -30,6 +30,14 @@ export class User {
     required: true,
   })
   status: string;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category' })
+  category: string;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Specialization' })
+  specialization: string;
+  @Prop({ type: Number, max: 2000, min: 500 })
+  perHourRate: number;
+  @Prop()
+  description: string;
   @Prop()
   rating: number;
   @Prop(
@@ -44,6 +52,16 @@ export class User {
     }),
   )
   coverImage: Record<string, any>;
+  @Prop(
+    raw({
+      addressLine: { type: String },
+      landmark: { type: String },
+      pincode: { type: String },
+      city: { type: String },
+      state: { type: String },
+    }),
+  )
+  address: Record<string, string>;
   @Prop({ type: Boolean, default: true })
   acceptWork: boolean;
   @Prop(

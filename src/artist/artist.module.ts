@@ -4,11 +4,16 @@ import { ArtistService } from './artist.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Category, CategorySchema } from './schemas/category.schema';
 import { Specialization, SpecializationSchema } from './schemas/specialization.schema';
+import { UserModule } from 'src/user/user.module';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Category.name, schema: CategorySchema }]),
     MongooseModule.forFeature([{ name: Specialization.name, schema: SpecializationSchema }]),
+    UserModule,
+    AuthModule,
   ],
   controllers: [ArtistController],
   providers: [ArtistService],
