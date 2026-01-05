@@ -1,3 +1,4 @@
+import { AddressDto } from './address.dto';
 import { ImageDto } from './image.dto';
 
 export class UpdateUserDto {
@@ -11,4 +12,9 @@ export class UpdateUserDto {
     code: string;
     expires: number;
   };
+  address?: AddressDto;
+  category?: string;
+  specialization?: string;
+  perHourRate?: number;
+  description?: string;
 }

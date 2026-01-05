@@ -1,11 +1,14 @@
-import { ImageDto } from './image.dto';
-
 export class CreateArtistDto {
+  type?: string;
   firstName: string;
-  lastName: string;
-  email: string;
+  lastName?: string;
+  email?: string;
   phoneNumber: string;
-  profile_image?: ImageDto;
-  cover_image?: ImageDto;
+  profile_image?: {
+    url: string;
+  };
+  cover_image?: {
+    url: string;
+  };
   acceptWork?: boolean;
 }

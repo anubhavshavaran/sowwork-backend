@@ -1,39 +1,81 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Artist } from './schemas/artist.schema';
-import { Model } from 'mongoose';
-import { CreateArtistDto } from './dto/createArtist.dto';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UserRole, UserStatus } from 'src/common/constants';
+import { UserDocument } from 'src/user/schemas';
+import { UserService } from 'src/user/user.service';
+import { CreateArtistDto } from './dto';
+import { AddressDto, ArtistDescriptionDto } from 'src/user/dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class ArtistService {
-  constructor(@InjectModel(Artist.name) private artistModel: Model<Artist>) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) { }
 
-  async create(createArtistDto: CreateArtistDto): Promise<Artist> {
-    const createdCat = new this.artistModel(createArtistDto);
-    return createdCat.save();
-  }
+  async onboarding(artistData: CreateArtistDto): Promise<any | null> {
+    try {
+      const newArtist: UserDocument | null = await this.userService.createUser({
+        firstName: artistData?.firstName,
+        lastName: artistData?.lastName,
+        email: artistData?.email,
+        phoneNumber: artistData?.phoneNumber,
+        userRole: UserRole.USER_ROLE_ARTIST,
+        status: UserStatus.STATUS_ACTIVE,
+      });
 
-  async findAll(): Promise<Artist[]> {
-    return this.artistModel.find().exec();
-  }
+      const payload = { _id: newArtist?._id, userRole: newArtist?.userRole };
+      const accessToken = await this.jwtService.signAsync(payload);
 
-  async findById(id: string): Promise<Artist> {
-    const artist = await this.artistModel.findById(id).exec();
-
-    if (!artist) {
-      throw new NotFoundException('Artist not found');
+      return {
+        accessToken,
+      }
+    } catch (error) {
+      if (error?.errorResponse?.code === 11000) {
+        throw new ForbiddenException(
+          'An artist with this phone number already exists.'
+        );
+      } else {
+        throw new ForbiddenException(
+          error?.errorResponse?.errMsg || 'Something went wrong.'
+        );
+      }
     }
-
-    return artist;
   }
 
-  async findByPhone(phoneNumber: string): Promise<Artist> {
-    const artist = await this.artistModel.findOne({ phoneNumber }).exec();
+  async addAddress(_id: Types.ObjectId, addAddress: AddressDto): Promise<any | null> {
+    try {
+      await this.userService.updateUser({ _id }, { address: addAddress });
 
-    if (!artist) {
-      throw new NotFoundException('Artist not found');
+      return {
+        error: false,
+        message: 'Address added successfully.',
+      };
+    } catch (error) {
+      throw new ForbiddenException(
+        error?.errorResponse?.errMsg || 'Something went wrong.'
+      );
     }
+  }
 
-    return artist;
+  async addDescription(_id: Types.ObjectId, description: ArtistDescriptionDto): Promise<any | null> {
+    try {
+      await this.userService.updateUser({ _id }, {
+        category: description?.category,
+        specialization: description?.specialization,
+        perHourRate: description?.perHourRate,
+        description: description?.description,
+      });
+
+      return {
+        error: false,
+        message: 'Description added successfully.',
+      };
+    } catch (error) {
+      throw new ForbiddenException(
+        error?.errorResponse?.errMsg || 'Something went wrong.'
+      );
+    }
   }
 }
