@@ -104,4 +104,19 @@ export class ArtistService {
       );
     }
   }
+
+  async toggleWorkStatus(_id: Types.ObjectId, acceptWork: boolean): Promise<any | null> {
+    try {
+      await this.userService.updateUser({ _id }, { acceptWork });
+
+      return {
+        error: false,
+        acceptWork,
+      };
+    } catch (error) {
+      throw new ForbiddenException(
+        error?.errorResponse?.errMsg || 'Something went wrong.'
+      );
+    }
+  }
 }

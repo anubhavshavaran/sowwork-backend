@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/auth/decorators';
-import { AddressDto, ArtistDescriptionDto } from 'src/user/dto';
+import { AddressDto, ArtistDescriptionDto, UpdateUserDto } from 'src/user/dto';
 import { AuthGuard } from 'src/guards';
 import { type UserDocument } from 'src/user/schemas';
 import { ArtistService } from './artist.service';
@@ -28,5 +28,12 @@ export class ArtistController {
   @UseGuards(AuthGuard)
   addDescription(@CurrentUser() user: UserDocument, @Body() artistData: ArtistDescriptionDto) {
     return this.artistService.addDescription(user?._id, artistData);
+  }
+
+  @Post('work-status')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthGuard)
+  completeOnboarding(@CurrentUser() user: UserDocument, @Body() artistData: UpdateUserDto) {
+    return this.artistService.toggleWorkStatus(user?._id, artistData?.acceptWork ?? false);
   }
 }
