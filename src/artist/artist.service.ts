@@ -6,13 +6,20 @@ import { UserService } from 'src/user/user.service';
 import { CreateArtistDto } from './dto';
 import { AddressDto, ArtistDescriptionDto } from 'src/user/dto';
 import { Types } from 'mongoose';
+import { OllamaEmbeddings } from '@langchain/ollama';
+import { CategoryService } from './category.service';
 
 @Injectable()
 export class ArtistService {
+  private readonly ollamaEmbeddings;
+
   constructor(
     private readonly userService: UserService,
+    private readonly categoryService: CategoryService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {
+    this.ollamaEmbeddings = new OllamaEmbeddings({ model: 'nomic-embed-text:latest' });
+  }
 
   async onboarding(artistData: CreateArtistDto): Promise<any | null> {
     try {
@@ -61,16 +68,50 @@ export class ArtistService {
 
   async addDescription(_id: Types.ObjectId, description: ArtistDescriptionDto): Promise<any | null> {
     try {
+      const user = await this.userService.findUser({ _id });
+      const category = await this.categoryService.findCategory({ _id: description?.category });
+      const specialization = await this.categoryService.findSpecialization({ _id: description?.specialization });
+
+      const textToEmbed = `
+      Name: ${user?.firstName} ${user?.lastName}
+      Role: ${user?.userRole}
+      User Description: ${user?.description}
+      Category: ${category ? category.name : ''}
+      Category Description: ${category ? category.description : ''}
+      Specialization: ${specialization ? specialization.name : ''}
+      Specialization Description: ${specialization ? specialization.description : ''}
+      Per Hour Rate: ${user?.perHourRate}
+      Location: ${user?.address?.city}, ${user?.address?.state}
+      `.replace(/\n/g, " ");
+
+      const vector = await this.ollamaEmbeddings.embedQuery(textToEmbed);
+
       await this.userService.updateUser({ _id }, {
         category: description?.category,
         specialization: description?.specialization,
         perHourRate: description?.perHourRate,
         description: description?.description,
+        embedding: vector,
       });
 
       return {
         error: false,
         message: 'Description added successfully.',
+      };
+    } catch (error) {
+      throw new ForbiddenException(
+        error?.errorResponse?.errMsg || 'Something went wrong.'
+      );
+    }
+  }
+
+  async toggleWorkStatus(_id: Types.ObjectId, acceptWork: boolean): Promise<any | null> {
+    try {
+      await this.userService.updateUser({ _id }, { acceptWork });
+
+      return {
+        error: false,
+        acceptWork,
       };
     } catch (error) {
       throw new ForbiddenException(

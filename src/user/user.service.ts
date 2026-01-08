@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, UpdateResult } from 'mongoose';
+import { FilterQuery, Model, UpdateResult, UpdateQuery } from 'mongoose';
 import { User, UserDocument } from './schemas';
 import { CreateUserDto, UpdateUserDto } from './dto';
 
@@ -13,13 +13,17 @@ export class UserService {
     return newUser.save();
   }
 
-  async findUser(filterQuery: FilterQuery<User>): Promise<UserDocument | null> {
-    return this.userModel.findOne(filterQuery).exec();
+  async findUser(filterQuery: FilterQuery<User>, select: string[] = []): Promise<UserDocument | null> {
+    let query = this.userModel.findOne(filterQuery);
+    if (select.length > 0) {
+      query = query.select(select);
+    }
+    return query.exec();
   }
 
   async updateUser(
     filterQuery: FilterQuery<User>,
-    updateUserDto: UpdateUserDto,
+    updateUserDto: UpdateQuery<User>,
   ): Promise<UpdateResult> {
     return this.userModel.updateOne(filterQuery, updateUserDto).exec();
   }

@@ -43,6 +43,7 @@ import { JobModule } from './job/job.module';
     ChatModule,
     AddressModule,
     JobModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
