@@ -41,12 +41,40 @@ export class PostService {
           localField: 'user',
           foreignField: '_id',
           pipeline: [
-            { $project: { firstName: 1, lastName: 1, profileImage: 1 } }
+            { $project: { firstName: 1, lastName: 1, profileImage: 1, address: 1, category: 1, specialization: 1 } }
           ],
           as: 'user',
         },
       },
       { $unwind: '$user' },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'user.category',
+          foreignField: '_id',
+          as: 'user.category',
+        },
+      },
+      {
+        $unwind: {
+          path: '$user.category',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'specializations',
+          localField: 'user.specialization',
+          foreignField: '_id',
+          as: 'user.specialization',
+        },
+      },
+      {
+        $unwind: {
+          path: '$user.specialization',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $lookup: {
           from: 'likes',
@@ -110,7 +138,7 @@ export class PostService {
     try {
       const post = await this.postModel
         .findOne({ _id: postId, isDeleted: false })
-        .populate('user', 'firstName lastName profileImage')
+        .populate('user', 'firstName lastName profileImage address category specialization')
         .exec();
 
       if (!post) {
