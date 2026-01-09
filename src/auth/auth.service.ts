@@ -72,7 +72,7 @@ export class AuthService {
     const user: UserDocument | null = await this.userService.findUser({
       phoneNumber: validateCodeDto.phoneNumber,
       userRole: validateCodeDto.userRole,
-    });
+    }, ['-embedding']);
     const now = Date.now();
 
     if (!user) {
@@ -96,6 +96,7 @@ export class AuthService {
 
         return {
           accessToken,
+          user,
         };
       }
     }

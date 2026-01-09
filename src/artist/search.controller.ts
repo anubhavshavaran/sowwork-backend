@@ -1,18 +1,16 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
-import { ArtistService } from './artist.service';
 import { OllamaEmbeddings } from '@langchain/ollama';
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/schemas';
 import { Model } from 'mongoose';
 import { AuthGuard } from 'src/guards';
+import { User } from 'src/user/schemas';
 import { SearchDto } from './dto';
 
 @Controller('search')
 export class SearchController {
-    private readonly ollamaEmbeddings;
+  private readonly ollamaEmbeddings;
 
   constructor(
-    private readonly artistService: ArtistService,
     @InjectModel(User.name) private userModel: Model<User>
   ) {
     this.ollamaEmbeddings = new OllamaEmbeddings({ model: 'nomic-embed-text:latest' });
