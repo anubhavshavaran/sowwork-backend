@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/guards';
 import { SearchDto } from '../dto';
 import { SearchService } from '../services/search.service';
@@ -16,7 +16,7 @@ export class SearchController {
     return this.searchService.searchArtists(search);
   }
   
-  @Post('get-artist-profile')
+  @Get('get-artist-profile')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   testEmbed(@Query('artistId') artistId: string) {
