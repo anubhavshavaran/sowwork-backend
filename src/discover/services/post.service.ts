@@ -158,6 +158,13 @@ export class PostService {
       .exec();
   }
 
+  async findArtistPortfolio(artistId: string) {
+    return this.postModel
+      .find({ user: artistId, isDeleted: false, postOnPortfolio: true })
+      .sort({ created_at: -1 })
+      .exec();
+  }
+
   async delete(postId: string, artistId: string) {
     const post: PostDocument | null = await this.postModel.findById(postId);
 

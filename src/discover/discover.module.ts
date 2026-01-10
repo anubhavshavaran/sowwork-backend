@@ -33,5 +33,6 @@ import { UserModule } from '../user/user.module';
   ],
   controllers: [DiscoverController],
   providers: [BookmarkService, PostService, CommentService, LikeService],
+  exports: [PostService],
 })
 export class DiscoverModule {}
