@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/auth/decorators';
 import { AuthGuard } from 'src/guards';
 import { type UserDocument } from './schemas';
@@ -16,7 +16,7 @@ export class UserController {
     return this.userService.findUser({ _id: user?._id }, ['-embedding']);
   }
 
-  @Get('update-profile')
+  @Post('update-profile')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   updateProfile(@CurrentUser() user: UserDocument, @Body() updateProfileDto: CreateUserDto) {
