@@ -3,8 +3,8 @@ import { CurrentUser } from 'src/auth/decorators';
 import { AddressDto, ArtistDescriptionDto, UpdateUserDto } from 'src/user/dto';
 import { AuthGuard } from 'src/guards';
 import { type UserDocument } from 'src/user/schemas';
-import { ArtistService } from './artist.service';
-import { CreateArtistDto } from './dto';
+import { ArtistService } from '../services/artist.service';
+import { CreateArtistDto } from '../dto';
 
 @Controller('artist')
 export class ArtistController {

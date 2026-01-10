@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AuthGuard } from 'src/guards';
 import { User } from 'src/user/schemas';
-import { SearchDto } from './dto';
+import { SearchDto } from '../dto';
 
 @Controller('search')
 export class SearchController {

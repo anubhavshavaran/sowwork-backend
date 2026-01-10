@@ -2,13 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
-import { ArtistController } from './artist.controller';
-import { ArtistService } from './artist.service';
-import { CategoryService } from './category.service';
-import { Category, CategorySchema } from './schemas/category.schema';
-import { Specialization, SpecializationSchema } from './schemas/specialization.schema';
-import { SearchController } from './search.controller';
+import { Category, CategorySchema, Specialization, SpecializationSchema } from './schemas';
 import { User, UserSchema } from 'src/user/schemas';
+import { ArtistService, CategoryService } from './services';
+import { ArtistController, SearchController } from './controllers';
 
 @Module({
   imports: [

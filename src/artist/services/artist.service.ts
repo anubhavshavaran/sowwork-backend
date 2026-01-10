@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRole, UserStatus } from 'src/common/constants';
 import { UserDocument } from 'src/user/schemas';
 import { UserService } from 'src/user/user.service';
-import { CreateArtistDto } from './dto';
+import { CreateArtistDto } from '../dto';
 import { AddressDto, ArtistDescriptionDto } from 'src/user/dto';
 import { Types } from 'mongoose';
 import { OllamaEmbeddings } from '@langchain/ollama';

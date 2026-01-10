@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, UpdateResult } from 'mongoose';
-import { Category, CategoryDocument, Specialization } from './schemas';
+import { Category, CategoryDocument, Specialization } from '../schemas';
 
 @Injectable()
 export class CategoryService {
