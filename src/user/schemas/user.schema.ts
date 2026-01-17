@@ -36,7 +36,7 @@ export class User {
   specialization: string;
   @Prop({ type: Number, max: 2000, min: 500 })
   perHourRate: number;
-  @Prop({ type: [Number], index: true })
+  @Prop({ type: [Number] })
   embedding: number[];
   @Prop()
   description: string;

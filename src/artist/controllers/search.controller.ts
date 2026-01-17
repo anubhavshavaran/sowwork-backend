@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } f
 import { AuthGuard } from 'src/guards';
 import { SearchDto } from '../dto';
 import { SearchService } from '../services/search.service';
+import { PostRequestFilterDto } from 'src/common/dto';
 
 @Controller('search')
 export class SearchController {
@@ -19,7 +20,14 @@ export class SearchController {
   @Get('get-artist-profile')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  testEmbed(@Query('artistId') artistId: string) {
+  getArtistProfile(@Query('artistId') artistId: string) {
     return this.searchService.getArtistProfile(artistId);
+  }
+
+  @Post('home')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  searchHome(@Body() filter: PostRequestFilterDto) {
+    return this.searchService.getRandomArtists(filter);
   }
 }

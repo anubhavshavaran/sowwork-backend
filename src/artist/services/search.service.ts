@@ -7,6 +7,8 @@ import { User } from "src/user/schemas";
 import { UserService } from "src/user/user.service";
 import { SearchDto } from "../dto";
 import { ArtistService } from "./artist.service";
+import { PostRequestFilterDto } from "src/common/dto";
+import { UserRole, UserStatus } from "src/common/constants";
 
 @Injectable()
 export class SearchService {
@@ -26,21 +28,28 @@ export class SearchService {
 
         const results = await this.userModel.aggregate([
             {
-                "$vectorSearch": {
-                    "index": "default",
-                    "path": "embedding",
-                    "queryVector": queryVector,
-                    "numCandidates": 100,
-                    "limit": 10
+                $vectorSearch: {
+                    index: "vector_index",
+                    path: "embedding",
+                    queryVector: queryVector,
+                    numCandidates: 100,
+                    limit: 10,
+                    filter: {
+                        $and: [
+                            { userRole: UserRole.USER_ROLE_ARTIST },
+                            { status: UserStatus.STATUS_ACTIVE },
+                            { acceptWork: true }
+                        ]
+                    }
                 }
             },
             {
-                "$project": {
-                    "firstName": 1,
-                    "lastName": 1,
-                    "description": 1,
-                    "userRole": 1,
-                    "score": { "$meta": "vectorSearchScore" }
+                $project: {
+                    firstName: 1,
+                    lastName: 1,
+                    description: 1,
+                    userRole: 1,
+                    score: { $meta: "vectorSearchScore" }
                 }
             }
         ]);
@@ -59,6 +68,65 @@ export class SearchService {
                 throw new ForbiddenException('Artist not found');
             }
             return { artist, deliverables, faqs, posts };
+        } catch (error) {
+            throw new ForbiddenException('Error fetching artist profile');
+        }
+    }
+
+    async getRandomArtists(filter: PostRequestFilterDto): Promise<any> {
+        try {
+            const artists = await this.userModel.aggregate([
+                {
+                    $match: {
+                        userRole: UserRole.USER_ROLE_ARTIST,
+                        acceptWork: true,
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'categories',
+                        localField: 'category',
+                        foreignField: '_id',
+                        as: 'category'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$category',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'specializations',
+                        localField: 'specialization',
+                        foreignField: '_id',
+                        as: 'specialization'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$specialization',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $sample: { size: filter.limit }
+                },
+                {
+                    $project: {
+                        embedding: 0,
+                        __v: 0,
+                        loginCode: 0,
+                        createdAt: 0,
+                        updatedAt: 0,
+                        isDeleted: 0,
+                        deletedAt: 0
+                    }
+                }
+            ]);
+
+            return { artists };
         } catch (error) {
             throw new ForbiddenException('Error fetching artist profile');
         }
