@@ -73,6 +73,8 @@ export class User {
     }),
   )
   loginCode: Record<string, any>;
+  @Prop({ type: String })
+  firebaseNotificationToken: string;
   @Prop()
   isDeleted: boolean;
   @Prop()

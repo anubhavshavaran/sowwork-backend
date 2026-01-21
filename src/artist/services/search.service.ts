@@ -49,6 +49,10 @@ export class SearchService {
                     lastName: 1,
                     description: 1,
                     userRole: 1,
+                    address: 1,
+                    perHourRate: 1,
+                    rating: 1,
+                    profileImage: 1,
                     score: { $meta: "vectorSearchScore" }
                 }
             }

@@ -11,6 +11,7 @@ import { DiscoverModule } from './discover/discover.module';
 import { ChatModule } from './chat/chat.module';
 import { AddressModule } from './address/address.module';
 import { JobModule } from './job/job.module';
+import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { JobModule } from './job/job.module';
     AddressModule,
     JobModule,
     UserModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
