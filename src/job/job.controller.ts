@@ -1,7 +1,9 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
 import { JobService } from './job.service';
 import { AuthGuard } from 'src/guards';
-import { CreateJobRequestDto } from './dto';
+import { CreateJobRequestDto, JobDetailsDto } from './dto';
+import { type UserDocument } from 'src/user/schemas';
+import { CurrentUser } from 'src/auth/decorators';
 
 @Controller('job')
 export class JobController {
@@ -10,7 +12,42 @@ export class JobController {
   @Post('create-job-request')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  requestForJob(@Body() jobRequest: CreateJobRequestDto) {
-    return this.jobService.createJobRequest(jobRequest)
+  requestJob(@Body() jobRequest: CreateJobRequestDto, @CurrentUser() user: UserDocument) {
+    return this.jobService.createJobRequest(jobRequest);
+  }
+
+  @Post('accept-job-request')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  acceptJobRequest(@Body() jobRequest: CreateJobRequestDto) {
+    return "accepted";
+  }
+
+  @Post('mock-job-request')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  mockJobCreation(@Body() jobRequest: CreateJobRequestDto, @CurrentUser() user: UserDocument) {
+    return this.jobService.mockJob(user, jobRequest);
+  }
+
+  @Post('add-details')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  addDetails(@Query('jobid') jobId: string, @Body() job: JobDetailsDto) {
+    console.log('id', jobId);
+
+    return this.jobService.updateJob({ _id: jobId }, job);
+  }
+
+  @Get('get-all-jobs')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  getJobs(@CurrentUser() user: UserDocument) {
+    return this.jobService.findJob({
+      $or: [
+        { artist: user._id },
+        { customer: user._id }
+      ]
+    });
   }
 }

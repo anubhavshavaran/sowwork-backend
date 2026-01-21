@@ -7,6 +7,13 @@ enum Status {
   STATUS_RESOLVED = 'RESOLVED',
 }
 
+enum JobStatus {
+  ACTIVE = 'ACTIVE',
+  FINISHED = 'FINISHED',
+  COMPLETED = 'COMPLETED',
+  REJECTED = 'REJECTED',
+}
+
 enum UserStatus {
   STATUS_ACTIVE = 'ACTIVE',
   STATUS_INACTIVE = 'INACTIVE',
@@ -23,4 +30,4 @@ enum UserRole {
   USER_ROLE_ARTIST = 'ARTIST',
 }
 
-export { UserRole, Status, UserStatus };
+export { UserRole, Status, UserStatus, JobStatus };
