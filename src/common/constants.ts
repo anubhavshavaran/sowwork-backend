@@ -30,4 +30,9 @@ enum UserRole {
   USER_ROLE_ARTIST = 'ARTIST',
 }
 
-export { UserRole, Status, UserStatus, JobStatus };
+enum NotificationStatus {
+  SEEN = "SEEN",
+  UNSEEN = "UNSEEN"
+}
+
+export { UserRole, Status, UserStatus, JobStatus, NotificationStatus };

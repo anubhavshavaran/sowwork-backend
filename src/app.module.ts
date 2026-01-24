@@ -12,6 +12,7 @@ import { ChatModule } from './chat/chat.module';
 import { AddressModule } from './address/address.module';
 import { JobModule } from './job/job.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { FirebaseModule } from './firebase/firebase.module';
     JobModule,
     UserModule,
     FirebaseModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
