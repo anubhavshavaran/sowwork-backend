@@ -21,7 +21,7 @@ export class JobRequest {
     @Prop({
         type: String,
         enum: Status,
-        required: true,
+        default: Status.STATUS_PENDING,
     })
     status: string;
     @Prop({ type: Number, required: true })

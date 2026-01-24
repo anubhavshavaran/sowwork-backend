@@ -1,12 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { FirebaseService } from 'src/firebase/firebase.service';
+import { NotificationService } from 'src/notification/notification.service';
 import { UserService } from 'src/user/user.service';
 import { CreateJobRequestDto } from './dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Job } from './schemas';
-import { FilterQuery, Model, UpdateQuery } from 'mongoose';
-import { UserDocument } from 'src/user/schemas';
-import { NotificationService } from 'src/notification/notification.service';
+import { Job, JobRequest } from './schemas';
 
 @Injectable()
 export class JobService {
@@ -14,22 +13,36 @@ export class JobService {
     private readonly firebaseService: FirebaseService,
     private readonly userService: UserService,
     private readonly notificationService: NotificationService,
-    @InjectModel(Job.name) private jobModel: Model<Job>
+    @InjectModel(Job.name) private jobModel: Model<Job>,
+    @InjectModel(JobRequest.name) private jobRequestModel: Model<JobRequest>
   ) { }
 
-  async createJobRequest(jobRequest: CreateJobRequestDto) {
+  async createJobRequest(jobRequestDto: CreateJobRequestDto) {
     try {
-      const artist = await this.userService.findUser({ _id: jobRequest.artistId }, ["-embedding"]);      
+      const artist = await this.userService.findUser({ _id: jobRequestDto.artistId }, ["-embedding"]);
+      const customer = await this.userService.findUser({ _id: jobRequestDto.customerId }, ["-embedding"]);
+
+      const expires = new Date(new Date().getTime() + 60 * 1000).getTime();
+      const newJobRequest = await this.jobRequestModel.create({
+        artist: jobRequestDto.artistId,
+        customer: jobRequestDto.customerId,
+        date: jobRequestDto.date,
+        durationInHours: jobRequestDto.durationInHours,
+        expiresAt: expires
+      });
+
       await this.firebaseService.sendNotification(
         artist?.firebaseNotificationToken || '',
-        "Job Request",
-        "You have a job request"
+        "New Job Request",
+        `${customer?.firstName} ${customer?.lastName} wants to collaborate with you!`
       );
       this.notificationService.create({
         title: "New Job Request",
-        message: "A Customer wants to collaborate with you!",
-        user: jobRequest.artistId,
+        message: `${customer?.firstName} ${customer?.lastName} wants to collaborate with you!`,
+        user: jobRequestDto.artistId,
       });
+
+      return newJobRequest;
     } catch (error) {
       throw new ForbiddenException('Error creating the job request');
     }

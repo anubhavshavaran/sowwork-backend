@@ -15,14 +15,4 @@ export class NotificationController {
     getNotifications(@CurrentUser() user: UserDocument) {
         return this.notificationService.findByUser(user._id);
     }
-
-    @Post('create')
-    @UseGuards(AuthGuard)
-    create(@CurrentUser() user: UserDocument) {
-        return this.notificationService.create({
-            title: "New Job Request",
-            message: "A Customer wants to collaborate with you!",
-            user:"6918b336c3e3152e592ede43",
-        });
-    }
 }
