@@ -1,37 +1,27 @@
-import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { NotificationService } from './notification.service';
-import { Logger } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
+import { OnGatewayConnection, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { WsAuthGuard } from 'src/guards';
 
 @WebSocketGateway()
-export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly notificationService: NotificationService) {}
-
+export class NotificationGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  private logger = new Logger('NotificationsGateway');
-
+  @UseGuards(WsAuthGuard)
   async handleConnection(client: Socket) {
     const { userId } = client.handshake.query;
 
-    // if (!userId) {
-    //   this.logger.warn(`Socket ${client.id} connected without userId. Disconnecting...`);
-    //   client.disconnect();
-    //   return;
-    // }
+    if (!userId) {
+      client.disconnect();
+      return;
+    }
 
-    const roomName = `user_${userId}`;
+    const roomName = `notification_channel_${userId}`;
     await client.join(roomName);
-
-    this.logger.log(`User ${userId} (Socket: ${client.id}) joined room: ${roomName}`);
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Socket ${client.id} disconnected`);
-  }
-
-  notifyUser(userId: number, payload: any) {
-    this.server.to(`user_${userId}`).emit('notification', payload);
+  notifyUser(userId: string, payload: any) {
+    this.server.to(`notification_channel_${userId}`).emit('notifications', payload);
   }
 }

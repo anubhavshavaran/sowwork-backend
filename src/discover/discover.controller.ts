@@ -119,8 +119,6 @@ export class DiscoverController {
     @Query('id') id: string,
     @CurrentUser() user: UserDocument,
   ) {
-    console.log(`Post with id ${id} has been successfully reported the user ${user?._id}`);
-
     return true;
   }
 }

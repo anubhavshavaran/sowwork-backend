@@ -1,16 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/createNotification.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Notification } from './schemas';
 import { Model, Types } from 'mongoose';
+import { NotificationGateway } from './notification.gateway';
 
 @Injectable()
 export class NotificationService {
-  constructor(@InjectModel(Notification.name) private notifModel: Model<Notification>) { }
+  constructor(
+    @InjectModel(Notification.name) private notifModel: Model<Notification>,
+    private readonly notificationGateway: NotificationGateway,
+  ) { }
 
   async create(createNotificationDto: CreateNotificationDto) {
-    const notitifcation = await this.notifModel.create(createNotificationDto);
-    return notitifcation;
+    try {
+      const notification = await this.notifModel.create(createNotificationDto);
+      this.notificationGateway.notifyUser(createNotificationDto.user, notification);
+      return notification;
+    } catch (error) {
+      throw new ForbiddenException('Error creating the job request');
+    }
   }
 
   async findByUser(userId: Types.ObjectId) {

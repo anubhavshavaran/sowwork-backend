@@ -6,6 +6,7 @@ import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Job, JobSchema, JobRequest, JobRequestSchema } from './schemas';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { Job, JobSchema, JobRequest, JobRequestSchema } from './schemas';
     MongooseModule.forFeature([{ name: Job.name, schema: JobSchema }]),
     FirebaseModule,
     UserModule,
-    AuthModule
+    AuthModule,
+    NotificationModule,
   ],
   controllers: [JobController],
   providers: [JobService],

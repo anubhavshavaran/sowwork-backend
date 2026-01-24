@@ -23,19 +23,10 @@ export class JobController {
     return "accepted";
   }
 
-  @Post('mock-job-request')
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthGuard)
-  mockJobCreation(@Body() jobRequest: CreateJobRequestDto, @CurrentUser() user: UserDocument) {
-    return this.jobService.mockJob(user, jobRequest);
-  }
-
   @Post('add-details')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   addDetails(@Query('jobid') jobId: string, @Body() job: JobDetailsDto) {
-    console.log('id', jobId);
-
     return this.jobService.updateJob({ _id: jobId }, job);
   }
 
