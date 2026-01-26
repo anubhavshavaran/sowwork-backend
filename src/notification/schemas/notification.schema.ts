@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
-import { NotificationStatus } from 'src/common/constants';
+import { NotificationStatus, NotificationType } from 'src/common/constants';
 
 export type NotificationDocument = HydratedDocument<Notification>;
 
@@ -14,10 +14,16 @@ export class Notification {
     title: string;
     @Prop({ type: String })
     message: string;
+    @Prop({ type: String, enum: NotificationType, required: true, default: NotificationType.ALERT })
+    type: string;
     @Prop({ type: String, enum: NotificationStatus, required: true, default: NotificationStatus.UNSEEN })
     status: string;
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
     user: string;
+    @Prop({
+        type: MongooseSchema.Types.ObjectId, ref: 'JobRequest', required: false, default: null
+    })
+    jobRequest: string;
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

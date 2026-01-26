@@ -6,6 +6,7 @@ import { NotificationService } from 'src/notification/notification.service';
 import { UserService } from 'src/user/user.service';
 import { CreateJobRequestDto } from './dto';
 import { Job, JobRequest } from './schemas';
+import { NotificationType } from 'src/common/constants';
 
 @Injectable()
 export class JobService {
@@ -40,6 +41,8 @@ export class JobService {
         title: "New Job Request",
         message: `${customer?.firstName} ${customer?.lastName} wants to collaborate with you!`,
         user: jobRequestDto.artistId,
+        type: NotificationType.JOB_REQUEST,
+        jobRequest: newJobRequest._id.toString()
       });
 
       return newJobRequest;

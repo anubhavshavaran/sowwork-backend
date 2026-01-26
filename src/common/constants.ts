@@ -35,4 +35,9 @@ enum NotificationStatus {
   UNSEEN = "UNSEEN"
 }
 
-export { UserRole, Status, UserStatus, JobStatus, NotificationStatus };
+enum NotificationType {
+  JOB_REQUEST = "JOB_REQUEST",
+  ALERT = "ALERT"
+}
+
+export { UserRole, Status, UserStatus, JobStatus, NotificationStatus, NotificationType };
