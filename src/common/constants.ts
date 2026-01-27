@@ -10,8 +10,8 @@ enum Status {
 enum JobStatus {
   ACTIVE = 'ACTIVE',
   FINISHED = 'FINISHED',
-  COMPLETED = 'COMPLETED',
-  REJECTED = 'REJECTED',
+  PAYMENT_PENDING = 'PAYMENT_PENDING',
+  CANCELLED = 'CANCELLED',
 }
 
 enum JobRequestStatus {

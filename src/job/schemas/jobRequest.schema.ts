@@ -18,6 +18,8 @@ export class JobRequest {
     date: number;
     @Prop({ type: Number, required: true })
     durationInHours: number;
+    @Prop({ type: Number, required: true })
+    amount: number;
     @Prop({
         type: String,
         enum: JobRequestStatus,

@@ -24,7 +24,7 @@ export class Job {
     type: String,
     enum: JobStatus,
     required: true,
-    default: JobStatus.ACTIVE
+    default: JobStatus.PAYMENT_PENDING
   })
   status: string;
   @Prop({ type: String })

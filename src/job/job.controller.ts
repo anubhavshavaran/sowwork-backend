@@ -26,8 +26,8 @@ export class JobController {
   @Post('accept-job-request')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  acceptJobRequest(@Body() jobRequest: CreateJobRequestDto) {
-    return "accepted";
+  acceptJobRequest(@Query('jobRequestId') jobRequestId: string) {
+    return this.jobService.acceptJobRequest(jobRequestId);
   }
 
   @Post('add-details')

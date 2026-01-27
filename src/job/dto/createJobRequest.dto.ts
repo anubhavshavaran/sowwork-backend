@@ -3,4 +3,5 @@ export class CreateJobRequestDto {
     customerId: string;
     date: number;
     durationInHours: number;
+    amount: number;
 }

@@ -51,6 +51,48 @@ export class JobService {
     }
   }
 
+  async acceptJobRequest(id: string) {
+    try {
+      const jobRequest = await this.jobRequestModel.findById(id).populate('artist customer');
+      const { customer, artist, durationInHours, date, expiresAt, isDeleted, amount }: any = jobRequest;
+      
+      const now = new Date().getTime();
+      if (jobRequest && (expiresAt > now || isDeleted)) {
+        return {
+          status: false,
+          message: "Job request expired"
+        }
+      }
+
+      if (jobRequest) {
+        await this.firebaseService.sendNotification(
+          customer?.firebaseNotificationToken || '',
+          "Job Request Accepted",
+          `${artist?.firstName} ${artist?.lastName} is ready to collaborate with you!`
+        );
+        this.notificationService.create({
+          title: "Job Request Accepted",
+          message: `${artist?.firstName} ${artist?.lastName} is ready to collaborate with you!`,
+          user: customer?._id,
+          type: NotificationType.JOB_REQUEST,
+        });
+
+        const job = await this.jobModel.create({
+          artist: artist?._id,
+          customer: customer?._id,
+          date,
+          durationInHours,
+          amount
+        });
+
+        return job;
+      }
+
+    } catch (error) {
+      throw new ForbiddenException('Error creating the job request');
+    }
+  }
+
   async updateJob(
     filterQuery: FilterQuery<Job>,
     updateQuery: UpdateQuery<Job>,
