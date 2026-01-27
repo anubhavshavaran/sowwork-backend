@@ -71,4 +71,14 @@ export class JobService {
       throw new ForbiddenException('Error creating the job request');
     }
   }
+
+  async findJobRequest(
+    filterQuery: FilterQuery<JobRequest>,
+  ) {
+    try {
+      return this.jobRequestModel.find(filterQuery);
+    } catch (error) {
+      throw new ForbiddenException('Error creating the job request');
+    }
+  }
 }

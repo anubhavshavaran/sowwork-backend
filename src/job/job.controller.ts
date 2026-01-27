@@ -9,10 +9,17 @@ import { CurrentUser } from 'src/auth/decorators';
 export class JobController {
   constructor(private readonly jobService: JobService) { }
 
+  @Get('get-job-request-status')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  getJobRquest(@Query('jobRequestId') jobRequestId: string) {
+    return this.jobService.findJobRequest({ _id: jobRequestId });
+  }
+
   @Post('create-job-request')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  requestJob(@Body() jobRequest: CreateJobRequestDto, @CurrentUser() user: UserDocument) {
+  requestJob(@Body() jobRequest: CreateJobRequestDto) {
     return this.jobService.createJobRequest(jobRequest);
   }
 

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
-import { Status } from 'src/common/constants';
+import { JobRequestStatus, Status } from 'src/common/constants';
 
 export type JobRequestDocument = HydratedDocument<JobRequest>;
 
@@ -20,8 +20,8 @@ export class JobRequest {
     durationInHours: number;
     @Prop({
         type: String,
-        enum: Status,
-        default: Status.STATUS_PENDING,
+        enum: JobRequestStatus,
+        default: JobRequestStatus.WAITING,
     })
     status: string;
     @Prop({ type: Number, required: true })

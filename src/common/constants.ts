@@ -14,6 +14,12 @@ enum JobStatus {
   REJECTED = 'REJECTED',
 }
 
+enum JobRequestStatus {
+  WAITING = 'WAITING',
+  CANCELLED = 'CANCELLED',
+  ACCEPTED = 'ACCEPTED',
+}
+
 enum UserStatus {
   STATUS_ACTIVE = 'ACTIVE',
   STATUS_INACTIVE = 'INACTIVE',
@@ -40,4 +46,4 @@ enum NotificationType {
   ALERT = "ALERT"
 }
 
-export { UserRole, Status, UserStatus, JobStatus, NotificationStatus, NotificationType };
+export { UserRole, Status, UserStatus, JobStatus, NotificationStatus, NotificationType, JobRequestStatus };
