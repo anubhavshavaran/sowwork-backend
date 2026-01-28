@@ -1,12 +1,12 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, UpdateQuery } from 'mongoose';
+import { JobRequestStatus, NotificationType } from 'src/common/constants';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { UserService } from 'src/user/user.service';
 import { CreateJobRequestDto } from './dto';
 import { Job, JobRequest } from './schemas';
-import { JobRequestStatus, NotificationType } from 'src/common/constants';
 
 @Injectable()
 export class JobService {
@@ -87,7 +87,7 @@ export class JobService {
 
         if (priorJob) {
           return priorJob;
-        } else {          
+        } else {
           const job = await this.jobModel.create({
             artist: artist?._id,
             customer: customer?._id,
@@ -105,6 +105,18 @@ export class JobService {
     }
   }
 
+  async cancelJobRequest(id: string) {
+    try {
+      await this.jobRequestModel.findOneAndUpdate({ _id: id }, { status: JobRequestStatus.CANCELLED });
+      return {
+        error: false,
+        message: "Job request cancelled"
+      };
+    } catch (error) {
+      throw new ForbiddenException('Error creating the job request');
+    }
+  }
+
   async fetchJobRequest(id: string) {
     try {
       const jobRequest = await this.jobRequestModel.findOne({
@@ -113,22 +125,21 @@ export class JobService {
 
       if (jobRequest?.status === JobRequestStatus.WAITING) {
         const now = new Date().getTime();
-        if (jobRequest && (jobRequest.expiresAt < now && jobRequest?.status === JobRequestStatus.WAITING)) {
-          await this.jobRequestModel.findByIdAndUpdate(id, { status: JobRequestStatus.CANCELLED });
-          return {
-            status: false,
-            message: "Job request expired"
-          }
-        }
-        return jobRequest;
-      } else if (jobRequest?.status === JobRequestStatus.ACCEPTED) {
-        const job = await this.jobModel.find({
-          jobRequest: id
-        });
+        if (jobRequest.expiresAt < now) {
+          const cancelledJobRequest = await this.jobRequestModel.findOneAndUpdate({
+            _id: id,
+            status: JobRequestStatus.WAITING
+          }, {
+            status: JobRequestStatus.CANCELLED
+          }, {
+            new: true
+          });
 
-        return job;
-      } else {
+          return cancelledJobRequest;
+        }
       }
+
+      return jobRequest;
     } catch (error) {
       throw new ForbiddenException('Error creating the job request');
     }

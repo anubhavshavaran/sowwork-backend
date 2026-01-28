@@ -13,7 +13,7 @@ export class JobController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   getJobRquest(@Query('jobRequestId') jobRequestId: string) {
-    return this.jobService.findJobRequest({ _id: jobRequestId });
+    return this.jobService.fetchJobRequest(jobRequestId);
   }
 
   @Post('create-job-request')
@@ -21,6 +21,13 @@ export class JobController {
   @UseGuards(AuthGuard)
   requestJob(@Body() jobRequest: CreateJobRequestDto) {
     return this.jobService.createJobRequest(jobRequest);
+  }
+
+  @Post('cancel-job-request')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthGuard)
+  cancelJobRequest(@Query('jobRequestId') jobRequestId: string) {
+    return this.jobService.cancelJobRequest(jobRequestId);
   }
 
   @Post('accept-job-request')
