@@ -19,5 +19,6 @@ import { NotificationModule } from 'src/notification/notification.module';
   ],
   controllers: [JobController],
   providers: [JobService],
+  exports: [JobService]
 })
 export class JobModule { }

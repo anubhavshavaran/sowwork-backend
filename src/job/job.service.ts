@@ -158,7 +158,7 @@ export class JobService {
 
   async findJob(
     filterQuery: FilterQuery<Job>,
-  ) {
+  ): Promise<Job[]> {
     try {
       return this.jobModel.find(filterQuery);
     } catch (error) {
@@ -193,7 +193,7 @@ export class JobService {
             localField: 'artist',
             foreignField: '_id',
             pipeline: [
-              { $project: { firstName: 1, lastName: 1, profileImage: 1, address: 1, category: 1, specialization: 1 } }
+              { $project: { firstName: 1, lastName: 1, profileImage: 1, address: 1, category: 1, specialization: 1, rating: 1 } }
             ],
             as: 'artist',
           },
