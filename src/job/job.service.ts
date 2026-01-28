@@ -175,4 +175,19 @@ export class JobService {
       throw new ForbiddenException('Error creating the job request');
     }
   }
+  
+  async getJob(id: string) {
+    try {
+      const job = await this.jobModel.findOne({
+        $or: [
+          { _id: id },
+          { jobRequest: id }
+        ]
+      });
+
+      return job;
+    } catch (error) {
+      throw new ForbiddenException('Error creating the job request');
+    }
+  }
 }
