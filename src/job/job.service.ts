@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, UpdateQuery } from 'mongoose';
+import { FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
 import { JobRequestStatus, NotificationType } from 'src/common/constants';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { NotificationService } from 'src/notification/notification.service';
@@ -175,15 +175,31 @@ export class JobService {
       throw new ForbiddenException('Error creating the job request');
     }
   }
-  
+
   async getJob(id: string) {
     try {
-      const job = await this.jobModel.findOne({
-        $or: [
-          { _id: id },
-          { jobRequest: id }
-        ]
-      });
+      const job = await this.jobModel.aggregate([
+        {
+          $match: {
+            $or: [
+              { _id: new Types.ObjectId(id) },
+              { jobRequest: new Types.ObjectId(id) }
+            ]
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'artist',
+            foreignField: '_id',
+            pipeline: [
+              { $project: { firstName: 1, lastName: 1, profileImage: 1, address: 1, category: 1, specialization: 1 } }
+            ],
+            as: 'artist',
+          },
+        },
+        { $unwind: '$artist' },
+      ]);
 
       return job;
     } catch (error) {

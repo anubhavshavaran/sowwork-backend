@@ -59,7 +59,7 @@ export class JobController {
   @Get('get-job')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  getJob(@Query('query') query: string) {
+  getJob(@Query('query') query: string) {    
     return this.jobService.getJob(query);
   }
 }
