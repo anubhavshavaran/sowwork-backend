@@ -6,7 +6,7 @@ import { NotificationService } from 'src/notification/notification.service';
 import { UserService } from 'src/user/user.service';
 import { CreateJobRequestDto } from './dto';
 import { Job, JobRequest } from './schemas';
-import { NotificationType } from 'src/common/constants';
+import { JobRequestStatus, NotificationType } from 'src/common/constants';
 
 @Injectable()
 export class JobService {
@@ -29,7 +29,8 @@ export class JobService {
         customer: jobRequestDto.customerId,
         date: jobRequestDto.date,
         durationInHours: jobRequestDto.durationInHours,
-        expiresAt: expires
+        expiresAt: expires,
+        amount: jobRequestDto.amount,
       });
 
       await this.firebaseService.sendNotification(
@@ -55,9 +56,10 @@ export class JobService {
     try {
       const jobRequest = await this.jobRequestModel.findById(id).populate('artist customer');
       const { customer, artist, durationInHours, date, expiresAt, isDeleted, amount }: any = jobRequest;
-      
+
       const now = new Date().getTime();
-      if (jobRequest && (expiresAt > now || isDeleted)) {
+      if (jobRequest && (expiresAt < now || isDeleted)) {
+        await this.jobRequestModel.findByIdAndUpdate(id, { status: JobRequestStatus.CANCELLED });
         return {
           status: false,
           message: "Job request expired"
@@ -65,6 +67,8 @@ export class JobService {
       }
 
       if (jobRequest) {
+        await this.jobRequestModel.findByIdAndUpdate(id, { status: JobRequestStatus.ACCEPTED });
+
         await this.firebaseService.sendNotification(
           customer?.firebaseNotificationToken || '',
           "Job Request Accepted",
@@ -77,17 +81,54 @@ export class JobService {
           type: NotificationType.JOB_REQUEST,
         });
 
-        const job = await this.jobModel.create({
-          artist: artist?._id,
-          customer: customer?._id,
-          date,
-          durationInHours,
-          amount
+        const priorJob = await this.jobModel.findOne({
+          jobRequest: id,
+        });
+
+        if (priorJob) {
+          return priorJob;
+        } else {          
+          const job = await this.jobModel.create({
+            artist: artist?._id,
+            customer: customer?._id,
+            jobRequest: id,
+            date,
+            durationInHours,
+            amount
+          });
+
+          return job;
+        }
+      }
+    } catch (error) {
+      throw new ForbiddenException('Error creating the job request');
+    }
+  }
+
+  async fetchJobRequest(id: string) {
+    try {
+      const jobRequest = await this.jobRequestModel.findOne({
+        _id: id,
+      });
+
+      if (jobRequest?.status === JobRequestStatus.WAITING) {
+        const now = new Date().getTime();
+        if (jobRequest && (jobRequest.expiresAt < now && jobRequest?.status === JobRequestStatus.WAITING)) {
+          await this.jobRequestModel.findByIdAndUpdate(id, { status: JobRequestStatus.CANCELLED });
+          return {
+            status: false,
+            message: "Job request expired"
+          }
+        }
+        return jobRequest;
+      } else if (jobRequest?.status === JobRequestStatus.ACCEPTED) {
+        const job = await this.jobModel.find({
+          jobRequest: id
         });
 
         return job;
+      } else {
       }
-
     } catch (error) {
       throw new ForbiddenException('Error creating the job request');
     }

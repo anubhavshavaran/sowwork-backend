@@ -14,6 +14,8 @@ export class Job {
   artist: string;
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   customer: string;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'JobRequest' })
+  jobRequest: string;
   @Prop({ type: Number, required: true })
   date: number;
   @Prop({ type: Number, required: true })
