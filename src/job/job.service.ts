@@ -150,7 +150,11 @@ export class JobService {
     updateQuery: UpdateQuery<Job>,
   ) {
     try {
-      return this.jobModel.updateOne(filterQuery, updateQuery);
+      this.jobModel.updateOne(filterQuery, updateQuery);
+      return {
+        error: false,
+        message: "Job updated"
+      };
     } catch (error) {
       throw new ForbiddenException('Error creating the job request');
     }

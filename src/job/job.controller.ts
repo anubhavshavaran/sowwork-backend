@@ -38,9 +38,9 @@ export class JobController {
   }
 
   @Post('add-details')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @UseGuards(AuthGuard)
-  addDetails(@Query('jobid') jobId: string, @Body() job: JobDetailsDto) {
+  addDetails(@Query('jobId') jobId: string, @Body() job: JobDetailsDto) {
     return this.jobService.updateJob({ _id: jobId }, job);
   }
 

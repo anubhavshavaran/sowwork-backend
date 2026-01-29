@@ -1,6 +1,8 @@
 export class JobDetailsDto {
-    ocassionTiming: string;
-    rehersalTiming: string;
+    startTime: number;
+    endTime: number;
+    rehersalStartTime?: number;
+    rehersalEndTime?: number;
     description: string;
     location: string;
 }

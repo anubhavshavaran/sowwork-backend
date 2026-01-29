@@ -29,10 +29,14 @@ export class Job {
     default: JobStatus.PAYMENT_PENDING
   })
   status: string;
-  @Prop({ type: String })
-  ocassionTiming: string;
-  @Prop({ type: String })
-  rehersalTiming: string;
+  @Prop({ type: Number })
+  startTime: number;
+  @Prop({ type: Number })
+  endTime: number;
+  @Prop({ type: Number })
+  rehersalStartTime: number;
+  @Prop({ type: Number })
+  rehersalEndTime: number;
   @Prop({ type: String })
   description: string;
   @Prop({ type: String })
