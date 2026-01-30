@@ -14,6 +14,7 @@ import { JobModule } from './job/job.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { NotificationModule } from './notification/notification.module';
 import { PaymentModule } from './payment/payment.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { PaymentModule } from './payment/payment.module';
     FirebaseModule,
     NotificationModule,
     PaymentModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
