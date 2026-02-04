@@ -11,6 +11,8 @@ export type AddressDocument = HydratedDocument<Address>;
 export class Address {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user: Types.ObjectId;
+  @Prop({ type: Boolean, default: false })
+  isPrimary: boolean;
   @Prop({ type: String })
   name: string;
   @Prop(

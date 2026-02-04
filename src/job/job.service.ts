@@ -18,15 +18,15 @@ export class JobService {
     @InjectModel(JobRequest.name) private jobRequestModel: Model<JobRequest>
   ) { }
 
-  async createJobRequest(jobRequestDto: CreateJobRequestDto) {
+  async createJobRequest(jobRequestDto: CreateJobRequestDto, customerId: Types.ObjectId) {
     try {
       const artist = await this.userService.findUser({ _id: jobRequestDto.artistId }, ["-embedding"]);
-      const customer = await this.userService.findUser({ _id: jobRequestDto.customerId }, ["-embedding"]);
+      const customer = await this.userService.findUser({ _id: customerId }, ["-embedding"]);
 
       const expires = new Date(new Date().getTime() + 60 * 1000).getTime();
       const newJobRequest = await this.jobRequestModel.create({
         artist: jobRequestDto.artistId,
-        customer: jobRequestDto.customerId,
+        customer: customerId,
         date: jobRequestDto.date,
         durationInHours: jobRequestDto.durationInHours,
         expiresAt: expires,
@@ -150,13 +150,13 @@ export class JobService {
     updateQuery: UpdateQuery<Job>,
   ) {
     try {
-      this.jobModel.updateOne(filterQuery, updateQuery);
+      await this.jobModel.updateOne(filterQuery, updateQuery);
       return {
         error: false,
         message: "Job updated"
       };
     } catch (error) {
-      throw new ForbiddenException('Error creating the job request');
+      throw new ForbiddenException('Error updating the job request');
     }
   }
 
@@ -206,6 +206,49 @@ export class JobService {
       ]);
 
       return job;
+    } catch (error) {
+      throw new ForbiddenException('Error creating the job request');
+    }
+  }
+
+  async getAllJobs(userId: Types.ObjectId) {
+    try {
+      const jobs = await this.jobModel.aggregate([
+        {
+          $match: {
+            $or: [
+              { artist: userId },
+              { customer: userId }
+            ]
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'artist',
+            foreignField: '_id',
+            pipeline: [
+              { $project: { firstName: 1, lastName: 1, profileImage: 1, address: 1, category: 1, specialization: 1, rating: 1 } }
+            ],
+            as: 'artist',
+          },
+        },
+        { $unwind: '$artist' },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'customer',
+            foreignField: '_id',
+            pipeline: [
+              { $project: { firstName: 1, lastName: 1 } }
+            ],
+            as: 'customer',
+          },
+        },
+        { $unwind: '$customer' },
+      ]);
+
+      return jobs;
     } catch (error) {
       throw new ForbiddenException('Error creating the job request');
     }
