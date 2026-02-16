@@ -44,6 +44,13 @@ export class JobController {
     return this.jobService.updateJob({ _id: jobId }, job);
   }
 
+  @Post('add-milestone')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthGuard)
+  addMilestone(@Query('jobId') jobId: string, @Body('milestone') milestone: string) {
+    return this.jobService.addMilestone({ _id: jobId }, milestone);
+  }
+
   @Get('get-all-jobs')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
@@ -54,7 +61,7 @@ export class JobController {
   @Get('get-job')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  getJob(@Query('query') query: string) {    
+  getJob(@Query('query') query: string) {
     return this.jobService.getJob(query);
   }
 }

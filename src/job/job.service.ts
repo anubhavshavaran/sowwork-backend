@@ -145,6 +145,25 @@ export class JobService {
     }
   }
 
+  async addMilestone(
+    filterQuery: FilterQuery<Job>,
+    milestone: string,
+  ) {
+    try {
+      await this.jobModel.updateOne(filterQuery, {
+        $push: {
+          milestones: milestone,
+        }
+      });
+      return {
+        error: false,
+        message: "Added Milestone"
+      };
+    } catch (error) {
+      throw new ForbiddenException('Error adding milestone');
+    }
+  }
+
   async updateJob(
     filterQuery: FilterQuery<Job>,
     updateQuery: UpdateQuery<Job>,
@@ -203,6 +222,18 @@ export class JobService {
           },
         },
         { $unwind: '$artist' },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'customer',
+            foreignField: '_id',
+            pipeline: [
+              { $project: { firstName: 1, lastName: 1, profileImage: 1, address: 1, category: 1, specialization: 1, rating: 1 } }
+            ],
+            as: 'customer',
+          },
+        },
+        { $unwind: '$customer' },
       ]);
 
       return job;
