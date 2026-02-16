@@ -101,7 +101,7 @@ export class JobService {
         }
       }
     } catch (error) {
-      throw new ForbiddenException('Error creating the job request');
+      throw new ForbiddenException('Error Accepting the job request');
     }
   }
 
@@ -141,7 +141,45 @@ export class JobService {
 
       return jobRequest;
     } catch (error) {
-      throw new ForbiddenException('Error creating the job request');
+      throw new ForbiddenException('Error fetching the job request');
+    }
+  }
+
+  async getJobRequest(id: string) {
+    try {
+      const jobRequest = await this.jobRequestModel.aggregate([
+        {
+          $match: { _id: new Types.ObjectId(id) },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'artist',
+            foreignField: '_id',
+            pipeline: [
+              { $project: { firstName: 1, lastName: 1, profileImage: 1, address: 1, category: 1, specialization: 1, rating: 1 } }
+            ],
+            as: 'artist',
+          },
+        },
+        { $unwind: '$artist' },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'customer',
+            foreignField: '_id',
+            pipeline: [
+              { $project: { firstName: 1, lastName: 1, profileImage: 1, address: 1, category: 1, specialization: 1, rating: 1 } }
+            ],
+            as: 'customer',
+          },
+        },
+        { $unwind: '$customer' },
+      ]);
+
+      return jobRequest;
+    } catch (error) {
+      throw new ForbiddenException('Error fetching the job request');
     }
   }
 

@@ -64,4 +64,11 @@ export class JobController {
   getJob(@Query('query') query: string) {
     return this.jobService.getJob(query);
   }
+
+  @Get('get-job-request')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  getJobRequest(@Query('jobRequestId') jobRequestId: string) {
+    return this.jobService.getJobRequest(jobRequestId);
+  }
 }
