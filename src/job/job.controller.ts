@@ -19,8 +19,8 @@ export class JobController {
   @Post('create-job-request')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  requestJob(@Body() jobRequest: CreateJobRequestDto) {
-    return this.jobService.createJobRequest(jobRequest);
+  requestJob(@Body() jobRequest: CreateJobRequestDto, @CurrentUser() user: UserDocument) {
+    return this.jobService.createJobRequest(jobRequest, user?._id);
   }
 
   @Post('cancel-job-request')
@@ -44,22 +44,31 @@ export class JobController {
     return this.jobService.updateJob({ _id: jobId }, job);
   }
 
+  @Post('add-milestone')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthGuard)
+  addMilestone(@Query('jobId') jobId: string, @Body('milestone') milestone: string) {
+    return this.jobService.addMilestone({ _id: jobId }, milestone);
+  }
+
   @Get('get-all-jobs')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   getJobs(@CurrentUser() user: UserDocument) {
-    return this.jobService.findJob({
-      $or: [
-        { artist: user._id },
-        { customer: user._id }
-      ]
-    });
+    return this.jobService.getAllJobs(user?._id);
   }
 
   @Get('get-job')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  getJob(@Query('query') query: string) {    
+  getJob(@Query('query') query: string) {
     return this.jobService.getJob(query);
+  }
+
+  @Get('get-job-request')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  getJobRequest(@Query('jobRequestId') jobRequestId: string) {
+    return this.jobService.getJobRequest(jobRequestId);
   }
 }

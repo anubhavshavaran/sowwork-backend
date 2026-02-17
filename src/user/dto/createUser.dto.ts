@@ -11,4 +11,5 @@ export class CreateUserDto {
     code: string;
     expires: number;
   };
+  firebaseNotificationToken?: string;
 }

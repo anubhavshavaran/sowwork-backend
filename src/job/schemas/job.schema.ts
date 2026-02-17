@@ -41,6 +41,8 @@ export class Job {
   description: string;
   @Prop({ type: String })
   location: string;
+  @Prop([String])
+  milestones: Array<string>;
   @Prop()
   isDeleted: boolean;
   @Prop()
